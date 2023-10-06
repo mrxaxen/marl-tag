@@ -1,3 +1,8 @@
+# Other
+.vscode/*
+!.vscode/tasks.json
+
+# ROS2 Default
 devel/
 logs/
 build/
