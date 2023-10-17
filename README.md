@@ -38,3 +38,7 @@ Install [ROS2 Humble Hawksbill](https://docs.ros.org/en/humble/Installation/Ubun
     * `Tasks: Run task`
     * `python3: dep symlink build`
     * Don't forget to `source install/setup.bash`
+11. If you have import problems within VSCode make sure that you have the correct interpreter selected:
+    * `Shift+Ctrl+P`
+    * `Python: Select Interpreter`
+    * Look for the one with `.venv` in it.
