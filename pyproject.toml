@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "marl-tag"
+version = "0.1.0"
+description = "MARL Tag game with ROS2 and Pettingzoo"
+authors = ["Aaron Serebrenik <yhc52f@inf.elte.hu>","Eszter, Gábor <nhlyn2@inf.elte.hu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pettingzoo = "^1.24.1"
+colcon-common-extensions = "^0.3.0"
+pygame = "^2.5.2"
+pymunk = "^6.5.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

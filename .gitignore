@@ -1,6 +1,7 @@
 # Other
 .vscode/*
 !.vscode/tasks.json
+!.vscode/settings.json
 
 # ROS2 Default
 devel/

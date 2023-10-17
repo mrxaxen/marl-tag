@@ -2,11 +2,22 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"type": "colcon",
-			"command": "colcon",
+			"label": "rosdep: install",
+			"type": "shell",
+			"command": "rosdep install -i --from-path src --rosdistro humble -y",
+			"args": [],
+			"group": "build",
+			"dependsOn": "Activate environments",
+		},
+		{
+			"label": "python3: dep symlink build",
+			"type": "shell",
+			"command": "${config:python.pythonPath}",
 			"args": [
+				"-m",
+				"colcon",
 				"build",
-				"--symlink-install",
+				"--symlink-install"
 			],
 			"problemMatcher": [
 				"$colcon-helper-gcc",
@@ -14,7 +25,7 @@
 				"$colcon-helper-msbuild-info"
 			],
 			"group": "build",
-			"label": "colcon: build"
-		}
+			"dependsOn": "rosdep: install"
+		},
 	]
 }
