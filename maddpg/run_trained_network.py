@@ -14,7 +14,7 @@ def obs_list_to_state_vector(observation):
 
 
 EVAL_INTERVAL = 1000
-MAX_STEPS = 40000
+MAX_STEPS = 4000
 evaluate_performance = True
 best_score = 0
 total_steps = 0
@@ -24,7 +24,7 @@ eval_steps = []
 
 
 
-env = simple_tag_v3.env(num_good=1, num_adversaries=3, max_cycles=40000, continuous_actions=False,
+env = simple_tag_v3.env(num_good=1, num_adversaries=3, max_cycles=MAX_STEPS, continuous_actions=False,
                                               num_obstacles=0, render_mode="human")
 env.reset(seed=42)
 n_agents = env.max_num_agents
@@ -114,4 +114,3 @@ for agent in env.agent_iter():
 
     env.step(action)
 env.close()
-

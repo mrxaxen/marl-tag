@@ -17,7 +17,7 @@ def run():
 
 
     EVAL_INTERVAL = 1000
-    MAX_STEPS = 40000
+    MAX_STEPS = 800_000
     evaluate_performance = False
     best_score = 0
     total_steps = 0
@@ -25,7 +25,7 @@ def run():
     eval_scores = []
     eval_steps = []
 
-    render_mode = "human" if evaluate_performance == True else "none"
+    render_mode = "human" if evaluate_performance is True else "none"
 
     parallel_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3,
                                               num_obstacles=0, continuous_actions=True, render_mode=render_mode)
@@ -41,14 +41,14 @@ def run():
         actor_dims.append(parallel_env.observation_space(agent).shape[0])
         n_actions.append(parallel_env.action_space(agent).shape[0])
         # print(f'agent is: {agent}, actions is: {parallel_env.action_space(agent).shape[0]}')
-    critic_dims = sum(actor_dims) + sum(n_actions)
-
+    critic_dims = sum(actor_dims) + sum(n_actions) # 3*12 + 10 + 4*5
+    # print(f'critic dims is: {critic_dims}')
+    # print(f"actor_dims is: {actor_dims}")
     maddpg_agents = MADDPG(actor_dims, critic_dims, n_agents, n_actions,
                            env=parallel_env, gamma=0.95, alpha=1e-4, beta=1e-3)
     critic_dims = sum(actor_dims)
     memory = MultiAgentReplayBuffer(5_000_000, critic_dims, actor_dims, # changed to 5m
                                     n_actions, n_agents, batch_size=1024)
-
 
 
     score = evaluate(maddpg_agents, parallel_env, episode, total_steps)
@@ -63,8 +63,8 @@ def run():
         terminal = [False] * n_agents
         # score = 0
         while not any(terminal):
-            if evaluate_performance:
-                time.sleep(0.25)  # to slow down the action
+            # if evaluate_performance:
+                # time.sleep(0.25)  # to slow down the action
 
             actions = maddpg_agents.choose_action(obs)
 
