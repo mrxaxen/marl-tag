@@ -4,6 +4,8 @@ from maddpg import MADDPG
 from buffer import MultiAgentReplayBuffer
 from pettingzoo.mpe import simple_speaker_listener_v4, simple_tag_v3
 from networks import ActorNetwork
+
+import threading
 import time
 
 def obs_list_to_state_vector(observation):
@@ -14,7 +16,7 @@ def obs_list_to_state_vector(observation):
 
 
 EVAL_INTERVAL = 1000
-MAX_STEPS = 4000
+MAX_STEPS = 40000
 evaluate_performance = True
 best_score = 0
 total_steps = 0
@@ -24,8 +26,15 @@ eval_steps = []
 
 
 
-env = simple_tag_v3.env(num_good=1, num_adversaries=3, max_cycles=MAX_STEPS, continuous_actions=False,
+eval_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3, max_cycles=40000, continuous_actions=True,
+                                              num_obstacles=0, render_mode="none")
+env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3, max_cycles=40000, continuous_actions=True,
                                               num_obstacles=0, render_mode="human")
+
+env.metadata["render_fps"] = 60
+eval_env.metadata["render_fps"] = 60
+
+eval_env.reset(seed=42)
 env.reset(seed=42)
 n_agents = env.max_num_agents
 
@@ -77,6 +86,42 @@ agent_0_network = ActorNetwork(alpha, agent_dims, fc1, fc2, n_actions,
 # print(next(agent_0_network.parameters()).is_cuda)
 # agent_0_network = agent_0_network.to(device)
 
+# Parallel
+playback_actions = []
+max_steps = 2000
+def play_env():
+    stepcount = 0
+    observations, infos = eval_env.reset()
+    run = True
+    while eval_env.agents and run:
+        actions = {
+            "adversary_0": adversary_0_network(T.tensor(observations["adversary_0"], device=device)).detach().to("cpu"),
+            "adversary_1": adversary_1_network(T.tensor(observations["adversary_1"], device=device)).detach().to("cpu"),
+            "adversary_2": adversary_2_network(T.tensor(observations["adversary_2"], device=device)).detach().to("cpu"),
+            "agent_0": agent_0_network(T.tensor(observations["agent_0"], device=device), ).detach().to("cpu"),
+        }
+        playback_actions.append(actions)
+        observations, rewards, terminations, truncations, infos = eval_env.step(actions)
+        print(f"Eval step: {stepcount}")
+        if stepcount >= max_steps:
+            run = False
+        stepcount += 1
+
+
+play_env()
+stepcount = 0
+run = True
+print(playback_actions)
+while env.agents and run:
+    actions = playback_actions.pop(0)
+    env.step(actions)
+    stepcount += 1
+    print(f"Step: {stepcount}")
+    if stepcount >= max_steps:
+        run = False
+env.close()
+
+"""
 for agent in env.agent_iter():
     observation, reward, termination, truncation, info = env.last()
     t_obs = T.tensor(observation)
@@ -114,3 +159,4 @@ for agent in env.agent_iter():
 
     env.step(action)
 env.close()
+"""

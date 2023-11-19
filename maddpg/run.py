@@ -16,16 +16,17 @@ def run():
             # continuous_actions=True, render_mode="human")
 
 
-    EVAL_INTERVAL = 1000
-    MAX_STEPS = 800_000
-    evaluate_performance = False
+    EVAL_INTERVAL = 100
+    MAX_STEPS = 400000
+    evaluate_performance = True
     best_score = 0
     total_steps = 0
     episode = 0
     eval_scores = []
     eval_steps = []
 
-    render_mode = "human" if evaluate_performance is True else "none"
+    #render_mode = "human" if evaluate_performance else "none"
+    render_mode = "none"
 
     parallel_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3,
                                               num_obstacles=0, continuous_actions=True, render_mode=render_mode)
@@ -41,14 +42,14 @@ def run():
         actor_dims.append(parallel_env.observation_space(agent).shape[0])
         n_actions.append(parallel_env.action_space(agent).shape[0])
         # print(f'agent is: {agent}, actions is: {parallel_env.action_space(agent).shape[0]}')
-    critic_dims = sum(actor_dims) + sum(n_actions) # 3*12 + 10 + 4*5
-    # print(f'critic dims is: {critic_dims}')
-    # print(f"actor_dims is: {actor_dims}")
+    critic_dims = sum(actor_dims) + sum(n_actions)
+
     maddpg_agents = MADDPG(actor_dims, critic_dims, n_agents, n_actions,
                            env=parallel_env, gamma=0.95, alpha=1e-4, beta=1e-3)
     critic_dims = sum(actor_dims)
     memory = MultiAgentReplayBuffer(5_000_000, critic_dims, actor_dims, # changed to 5m
-                                    n_actions, n_agents, batch_size=1024)
+                                    n_actions, n_agents, batch_size=2048)
+
 
 
     score = evaluate(maddpg_agents, parallel_env, episode, total_steps)
@@ -63,8 +64,8 @@ def run():
         terminal = [False] * n_agents
         # score = 0
         while not any(terminal):
-            # if evaluate_performance:
-                # time.sleep(0.25)  # to slow down the action
+            #if evaluate_performance:
+            #    time.sleep(0.25)  # to slow down the action
 
             actions = maddpg_agents.choose_action(obs)
 
@@ -84,13 +85,18 @@ def run():
             memory.store_transition(list_obs, state, list_actions, list_reward,
                                     list_obs_, state_, terminal)
 
-            if total_steps % 100 == 0 and not evaluate_performance:
+            #if total_steps % 100 == 0 and not evaluate_performance:
+            if total_steps % 100 == 0:
                 maddpg_agents.learn(memory)
             obs = obs_
             total_steps += 1
 
         if total_steps % EVAL_INTERVAL == 0:
-            score = evaluate(maddpg_agents, parallel_env, episode, total_steps)
+            eval_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3,
+                                             num_obstacles=0, continuous_actions=True, render_mode="human")
+            eval_env.metadata["render_fps"] = 60
+            score = evaluate(maddpg_agents, eval_env, episode, total_steps)
+            eval_env.close()
             eval_scores.append(score)
             eval_steps.append(total_steps)
 
@@ -109,8 +115,10 @@ def run():
 
 def evaluate(agents, env, ep, step, n_eval=3):
     score_history = []
+    adversary_scores = []
+    agent_scores = []
     for i in range(n_eval):
-        obs, _ = env.reset()
+        obs, _ = env.reset(seed=51)
         score = 0
         terminal = [False] * env.max_num_agents
         while not any(terminal):
@@ -124,13 +132,17 @@ def evaluate(agents, env, ep, step, n_eval=3):
             terminal = [d or t for d, t in zip(list_done, list_trunc)]
 
             obs = obs_
+            adversary_scores.append(reward['adversary_0'])
+            adversary_scores.append(reward['adversary_1'])
+            adversary_scores.append(reward['adversary_2'])
+            agent_scores.append(reward['agent_0'])
             score += sum(list_reward)
         score_history.append(score)
     avg_score = np.mean(score_history)
+    adv_avg_score = np.mean(adversary_scores)
+    agent_avg_score = np.mean(agent_scores)
 
-
-    print(f'Evaluation episode {ep} train steps {step}'
-          f' average score {avg_score:.1f}')
+    print(f'Evaluation episode {ep} train steps {step},avg score: {avg_score} adversary avg: {adv_avg_score}, agent: {agent_avg_score} ')
     return avg_score
 
 
