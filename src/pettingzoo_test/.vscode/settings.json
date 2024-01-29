@@ -1,12 +1,4 @@
 {
-    "python.pythonPath": ".venv/bin/python3",
-    "python.analysis.autoImportCompletions": true,
-    
-    "colcon.provideTasks": true,
-    "colcon.workspaceSetup": [
-        "/opt/ros/humble/setup.sh",
-        "install/setup.sh"
-    ],
     "python.autoComplete.extraPaths": [
         "/home/xaxen/ai_robotics/marl-tag/build/turtle_tag",
         "/home/xaxen/ai_robotics/marl-tag/install/turtle_tag/lib/python3.10/site-packages",
@@ -22,5 +14,5 @@
         "/home/xaxen/ai_robotics/marl-tag/install/pettingzoo_test/lib/python3.10/site-packages",
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages"
-    ],
+    ]
 }

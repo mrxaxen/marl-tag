@@ -6,11 +6,24 @@ authors = ["Aaron Serebrenik <yhc52f@inf.elte.hu>","Eszter, Gábor <nhlyn2@inf.e
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "3.10.*"
 pettingzoo = "^1.24.1"
 colcon-common-extensions = "^0.3.0"
 pygame = "^2.5.2"
 pymunk = "^6.5.1"
+torch = {version = "^2.1.0+cpu", source = "torch-cpu"}
+tensorboard = "^2.15.1"
+supersuit = "^3.9.0"
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "default"
+
+
+[[tool.poetry.source]]
+name = "torch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]

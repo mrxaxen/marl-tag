@@ -7,16 +7,19 @@ class MADDPG:
                  chkpt_dir='tmp/maddpg/', scenario='simple_tag'):
         self.agents = []
         chkpt_dir += scenario
-        for agent_idx in range(n_agents):
-            agent = list(env.action_spaces.keys())[agent_idx]
-            min_action = env.action_space(agent).low
-            max_action = env.action_space(agent).high
-            self.agents.append(Agent(actor_dims[agent_idx], critic_dims,
-                               n_actions[agent_idx], n_agents, agent_idx,
-                               alpha=alpha, beta=beta, tau=tau, fc1=fc1,
-                               fc2=fc2, chkpt_dir=chkpt_dir,
-                               gamma=gamma, min_action=min_action,
-                               max_action=max_action))
+        if env is None:
+            
+        else:
+            for agent_idx in range(n_agents):
+                agent = list(env.action_spaces.keys())[agent_idx]
+                min_action = env.action_space(agent).low
+                max_action = env.action_space(agent).high
+                self.agents.append(Agent(actor_dims[agent_idx], critic_dims,
+                                n_actions[agent_idx], n_agents, agent_idx,
+                                alpha=alpha, beta=beta, tau=tau, fc1=fc1,
+                                fc2=fc2, chkpt_dir=chkpt_dir,
+                                gamma=gamma, min_action=min_action,
+                                max_action=max_action))
 
     def save_checkpoint(self):
         for agent in self.agents:

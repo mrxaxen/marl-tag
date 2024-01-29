@@ -15,7 +15,6 @@ def run():
     # parallel_env = simple_speaker_listener_v4.parallel_env(
             # continuous_actions=True, render_mode="human")
 
-
     EVAL_INTERVAL = 100
     MAX_STEPS = 400000
     evaluate_performance = True
@@ -50,8 +49,6 @@ def run():
     memory = MultiAgentReplayBuffer(5_000_000, critic_dims, actor_dims, # changed to 5m
                                     n_actions, n_agents, batch_size=2048)
 
-
-
     score = evaluate(maddpg_agents, parallel_env, episode, total_steps)
     eval_scores.append(score)
     eval_steps.append(total_steps)
@@ -64,8 +61,8 @@ def run():
         terminal = [False] * n_agents
         # score = 0
         while not any(terminal):
-            #if evaluate_performance:
-            #    time.sleep(0.25)  # to slow down the action
+            # if evaluate_performance:
+            #     time.sleep(0.25)  # to slow down the action
 
             actions = maddpg_agents.choose_action(obs)
 
@@ -85,15 +82,20 @@ def run():
             memory.store_transition(list_obs, state, list_actions, list_reward,
                                     list_obs_, state_, terminal)
 
-            #if total_steps % 100 == 0 and not evaluate_performance:
+            # if total_steps % 100 == 0 and not evaluate_performance:
             if total_steps % 100 == 0:
                 maddpg_agents.learn(memory)
             obs = obs_
             total_steps += 1
 
         if total_steps % EVAL_INTERVAL == 0:
-            eval_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3,
-                                             num_obstacles=0, continuous_actions=True, render_mode="human")
+            eval_env = simple_tag_v3.parallel_env(
+                    num_good=1,
+                    num_adversaries=3,
+                    num_obstacles=0,
+                    continuous_actions=True,
+                    render_mode="human"
+                )
             eval_env.metadata["render_fps"] = 60
             score = evaluate(maddpg_agents, eval_env, episode, total_steps)
             eval_env.close()
@@ -105,7 +107,6 @@ def run():
                 print("saving checkpoint")
                 maddpg_agents.save_checkpoint()
                 best_score = score
-
 
         episode += 1
 
