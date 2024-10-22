@@ -33,6 +33,9 @@ class MADDPG:
             actions[agent_id] = action
         return actions
 
-    def learn(self, memory):
+    def learn(self, memory, total_steps, logger):
+        agent_metrics = []
         for agent in self.agents:
-            agent.learn(memory, self.agents)
+            avg_reward, avg_critic_loss, avg_critic_value, avg_actor_loss = agent.learn(memory, self.agents, total_steps, logger)
+            agent_metrics.append([avg_reward, avg_critic_loss, avg_critic_value, avg_actor_loss])
+        return agent_metrics

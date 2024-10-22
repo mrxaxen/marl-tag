@@ -71,7 +71,7 @@ class Agent:
         self.critic.load_checkpoint()
         self.target_critic.load_checkpoint()
 
-    def learn(self, memory, agent_list):
+    def learn(self, memory, agent_list, total_steps, logger):
         if not memory.ready():
             return
 
@@ -123,3 +123,19 @@ class Agent:
         self.actor.optimizer.step()
 
         self.update_network_parameters()
+
+        avg_reward = np.average(np.asarray(rewards.cpu().detach()))
+        avg_critic_loss = np.average(np.asarray(critic_loss.cpu().detach()))
+        avg_critic_value = np.average(np.asarray(critic_value.cpu().detach()))
+        avg_actor_loss = np.average(np.asarray(actor_loss.cpu().detach()))
+
+        logger.add_scalar(f'agent_{self.agent_idx}_avg_reward', avg_reward, total_steps)
+        logger.add_scalar(f'agent_{self.agent_idx}_avg_critic_loss', avg_critic_loss, total_steps)
+        logger.add_scalar(f'agent_{self.agent_idx}_avg_critic_value', avg_critic_value, total_steps)
+        logger.add_scalar(f'agent_{self.agent_idx}_avg_actor_loss', avg_actor_loss, total_steps)
+
+        return avg_reward, avg_critic_loss, avg_critic_value, avg_actor_loss
+        # print(f"Avg reward: {np.average(np.asarray(rewards.cpu().detach()))}")
+        # print(f"Avg critic loss: {np.average(np.asarray(critic_loss.cpu().detach()))}")
+        # print(f"Avg critic value: {np.average(np.asarray(critic_value.cpu().detach()))}")
+        # print(f"Avg actor loss: {np.average(np.asarray(actor_loss.cpu().detach()))}")

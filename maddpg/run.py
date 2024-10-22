@@ -2,6 +2,8 @@ import numpy as np
 from maddpg import MADDPG
 from buffer import MultiAgentReplayBuffer
 from pettingzoo.mpe import simple_speaker_listener_v4, simple_tag_v3
+from torch.utils.tensorboard import SummaryWriter
+
 import time
 
 def obs_list_to_state_vector(observation):
@@ -17,7 +19,8 @@ def run():
 
 
     EVAL_INTERVAL = 100
-    MAX_STEPS = 400000
+    MAX_STEPS = 2000000
+    DEFAULT_LOGDIR='logdir/scalar/maddpg'
     evaluate_performance = True
     best_score = 0
     total_steps = 0
@@ -25,11 +28,13 @@ def run():
     eval_scores = []
     eval_steps = []
 
+    writer_scalar = SummaryWriter(log_dir=DEFAULT_LOGDIR)
+
     #render_mode = "human" if evaluate_performance else "none"
     render_mode = "none"
 
     parallel_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3,
-                                              num_obstacles=0, continuous_actions=True, render_mode=render_mode)
+                                              num_obstacles=2, continuous_actions=True, render_mode=render_mode)
     _, _ = parallel_env.reset()
     n_agents = parallel_env.max_num_agents
 
@@ -59,6 +64,7 @@ def run():
     if evaluate_performance:
         maddpg_agents.load_checkpoint()
 
+    total_agent_metrics = np.array([])
     while total_steps < MAX_STEPS:
         obs, _ = parallel_env.reset()
         terminal = [False] * n_agents
@@ -85,15 +91,16 @@ def run():
             memory.store_transition(list_obs, state, list_actions, list_reward,
                                     list_obs_, state_, terminal)
 
-            #if total_steps % 100 == 0 and not evaluate_performance:
-            if total_steps % 100 == 0:
-                maddpg_agents.learn(memory)
+            if total_steps % 100 == 0 and not evaluate_performance:
+                if total_steps % 100 == 0:
+                    agent_metrics = maddpg_agents.learn(memory, total_steps, writer_scalar)
+                    #np.vstack((total_agent_metrics, agent_metrics))
             obs = obs_
             total_steps += 1
 
         if total_steps % EVAL_INTERVAL == 0:
             eval_env = simple_tag_v3.parallel_env(num_good=1, num_adversaries=3,
-                                             num_obstacles=0, continuous_actions=True, render_mode="human")
+                                             num_obstacles=2, continuous_actions=True, render_mode="human")
             eval_env.metadata["render_fps"] = 60
             score = evaluate(maddpg_agents, eval_env, episode, total_steps)
             eval_env.close()
@@ -111,6 +118,7 @@ def run():
 
     np.save('data/maddpg_scores.npy', np.array(eval_scores))
     np.save('data/maddpg_steps.npy', np.array(eval_steps))
+    writer_scalar.close()
 
 
 def evaluate(agents, env, ep, step, n_eval=3):
@@ -118,7 +126,7 @@ def evaluate(agents, env, ep, step, n_eval=3):
     adversary_scores = []
     agent_scores = []
     for i in range(n_eval):
-        obs, _ = env.reset(seed=51)
+        obs, _ = env.reset()
         score = 0
         terminal = [False] * env.max_num_agents
         while not any(terminal):

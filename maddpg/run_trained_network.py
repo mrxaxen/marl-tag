@@ -72,17 +72,17 @@ alpha = 1e-4
 device = 'cuda:0' if T.cuda.is_available() else 'cpu'
 
 adversary_0_network = ActorNetwork(alpha, adversary_dims, fc1, fc2, n_actions,
-                                  chkpt_dir="/tmp/maddpg/simple_tag/agent_0_actor",
-                                  name="agent_0"+'_target_actor')
+                                   chkpt_dir="decent_train/agent_0_actor",
+                                   name="agent_0"+'_target_actor')
 adversary_1_network = ActorNetwork(alpha, adversary_dims, fc1, fc2, n_actions,
-                                  chkpt_dir="/tmp/maddpg/simple_tag/agent_0_actor",
-                                  name="agent_1"+'_target_actor')
+                                   chkpt_dir="decent_train/agent_0_actor",
+                                   name="agent_1"+'_target_actor')
 adversary_2_network = ActorNetwork(alpha, adversary_dims, fc1, fc2, n_actions,
-                                  chkpt_dir="/tmp/maddpg/simple_tag/agent_0_actor",
-                                  name="agent_2"+'_target_actor')
+                                   chkpt_dir="decent_train/agent_0_actor",
+                                   name="agent_2"+'_target_actor')
 agent_0_network = ActorNetwork(alpha, agent_dims, fc1, fc2, n_actions,
-                                  chkpt_dir="/tmp/maddpg/simple_tag/agent_0_actor",
-                                  name="agent_3"+'_target_actor')
+                               chkpt_dir="decent_train/agent_0_actor",
+                               name="agent_3"+'_target_actor')
 # print(next(agent_0_network.parameters()).is_cuda)
 # agent_0_network = agent_0_network.to(device)
 

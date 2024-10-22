@@ -87,32 +87,32 @@ agent_0_network = ActorNetwork(alpha, agent_dims, fc1, fc2, n_actions,
 """
 
 adversary_0_agent = Agent(actor_dims=adversary_dims, critic_dims=critic_dims,
-                               n_actions=5, n_agents=num_agents, agent_idx=0,
-                               alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
-                               fc2=fc2, chkpt_dir="/tmp/maddpg/simple_tag/agent_0_actor",
-                               gamma=0.95, min_action=min_action,
-                               max_action=max_action)
+                          n_actions=5, n_agents=num_agents, agent_idx=0,
+                          alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
+                          fc2=fc2, chkpt_dir="decent_train/agent_0_actor",
+                          gamma=0.95, min_action=min_action,
+                          max_action=max_action)
 
 adversary_1_agent = Agent(actor_dims=adversary_dims, critic_dims=critic_dims,
-                               n_actions=5, n_agents=num_agents, agent_idx=1,
-                               alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
-                               fc2=fc2, chkpt_dir="/tmp/maddpg/simple_tag/agent_1_actor",
-                               gamma=0.95, min_action=min_action,
-                               max_action=max_action)
+                          n_actions=5, n_agents=num_agents, agent_idx=1,
+                          alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
+                          fc2=fc2, chkpt_dir="decent_train/agent_1_actor",
+                          gamma=0.95, min_action=min_action,
+                          max_action=max_action)
 
 adversary_2_agent = Agent(actor_dims=adversary_dims, critic_dims=critic_dims,
-                               n_actions=5, n_agents=num_agents, agent_idx=2,
-                               alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
-                               fc2=fc2, chkpt_dir="/tmp/maddpg/simple_tag/agent_2_actor",
-                               gamma=0.95, min_action=min_action,
-                               max_action=max_action)
+                          n_actions=5, n_agents=num_agents, agent_idx=2,
+                          alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
+                          fc2=fc2, chkpt_dir="decent_train/agent_2_actor",
+                          gamma=0.95, min_action=min_action,
+                          max_action=max_action)
 
 agent_0_agent = Agent(actor_dims=agent_dims, critic_dims=critic_dims,
-                               n_actions=5, n_agents=num_agents, agent_idx=2,
-                               alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
-                               fc2=fc2, chkpt_dir="/tmp/maddpg/simple_tag/agent_3_actor",
-                               gamma=0.95, min_action=min_action,
-                               max_action=max_action)
+                      n_actions=5, n_agents=num_agents, agent_idx=2,
+                      alpha=1e-4, beta=1e-3, tau=0.01, fc1=fc1,
+                      fc2=fc2, chkpt_dir="decent_train/agent_3_actor",
+                      gamma=0.95, min_action=min_action,
+                      max_action=max_action)
 
 
 
